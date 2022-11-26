@@ -7686,6 +7686,11 @@ def _generate_text(body: GenerationInputSchema):
             else:
                 saved_settings[key] = getattr(obj, entry[1])
                 setattr(obj, entry[1], getattr(body, key))
+
+    # Remote client shouldn't override our token limit
+    if "max_context_length" in saved_settings:
+        vars.max_length = min(vars.max_length, saved_settings["max_context_length"])
+
     try:
         if vars.allowsp and getattr(body, "soft_prompt", None) is not None:
             if any(q in body.soft_prompt for q in ("/", "\\")):
